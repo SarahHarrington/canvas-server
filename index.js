@@ -22,25 +22,35 @@ const io = new Server(server, {
 
 io.on('connection', async (socket) => {
   console.log('a user connected', socket.id);
-  io.emit('newUserJoined', socket.id)
+  socket.emit('newUserJoined', socket.id)
   users.push(socket.id)
+
   io.emit('connectedUserCount', users.length)
 
-  socket.on('disconnect', (e) => {
-    console.log('a user disconnected', e);
+  socket.on('disconnect', (reason) => {
+    console.log('a user disconnected', reason);
     users.pop();
     io.emit('clientDisconnected', users.length);
   })
 
   socket.on('userName', async (e) => {
+    console.log('userName e', e)
     const {name, socketId} = e;
     
-    const socket = await io.fetchSockets(socketId)
-    socket.data.username = name;
+    const socket = await io.fetchSockets(e.socketId)
+    console.log('socket', socket)
+    socket[0].data.userName = e.name;
+
+    const sockets = await io.fetchSockets();
+    
+    console.log('all the sockets', sockets)
+
   })
 
-  const sockets = await io.fetchSockets();
-  console.log('sockets', sockets)
+  socket.on('userIsDrawing', (e) => {
+    console.log('userIsDrawing', e)
+    io.emit('userDrawing', e)
+  })
 });
 
 
