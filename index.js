@@ -49,7 +49,7 @@ io.on('connection', async (socket) => {
 
   socket.on('userIsDrawing', (e) => {
     console.log('userIsDrawing', e)
-    io.emit('userDrawing', e)
+    socket.broadcast.emit('userDrawing', e)
   })
 });
 
